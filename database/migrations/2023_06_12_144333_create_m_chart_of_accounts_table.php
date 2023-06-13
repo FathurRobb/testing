@@ -17,7 +17,7 @@ class CreateMChartOfAccountsTable extends Migration
             $table->increments('id');
             $table->integer('kategori_id')->unsigned();
             $table->foreign('kategori_id')->references('id')->on('m_kategoris')->onDelete('cascade');
-            $table->string('kode')->unique();
+            $table->integer('kode')->unique();
             $table->string('nama');
             $table->timestamps();
             $table->softDeletes();
