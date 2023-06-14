@@ -17,7 +17,8 @@ use App\Http\Controllers\TbTransaksiController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    // return view('welcome');
+    return view('layout.template');
 });
 
 Route::resource('kategori', MKategoriController::class);

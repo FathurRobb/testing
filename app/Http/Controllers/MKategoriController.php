@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MKategori;
 use Illuminate\Http\Request;
+use DB;
 
 class MKategoriController extends Controller
 {
@@ -14,17 +15,8 @@ class MKategoriController extends Controller
      */
     public function index()
     {
-        $datas = MKategori::get();
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        $datas = MKategori::latest()->paginate(10);
+        return view('kategori.index', compact('datas'));
     }
 
     /**
@@ -44,17 +36,6 @@ class MKategoriController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\MKategori  $mKategori
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        $data = MKategori::findOrFail($id);
-    }
-
-    /**
      * Show the form for editing the specified resource.
      *
      * @param  \App\Models\MKategori  $mKategori
@@ -63,6 +44,7 @@ class MKategoriController extends Controller
     public function edit($id)
     {
         $data = MKategori::findOrFail($id);
+        return view('kategori.edit', compact('data'));
     }
 
     /**
@@ -79,7 +61,6 @@ class MKategoriController extends Controller
         ]);
 
         $data = MKategori::find($id)->update($request->all());
-
         return redirect()->route('kategori.index');
     }
 
@@ -89,10 +70,9 @@ class MKategoriController extends Controller
      * @param  \App\Models\MKategori  $mKategori
      * @return \Illuminate\Http\Response
      */
-    public function destroy(MKategori $mKategori)
+    public function destroy($id)
     {
         MKategori::find($id)->delete();
-        
         return redirect()->route('kategori.index');
     }
 }
