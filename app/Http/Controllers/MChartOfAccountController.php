@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\MChartOfAccount;
+use App\Models\MKategori;
 use Illuminate\Http\Request;
 
 class MChartOfAccountController extends Controller
@@ -14,17 +15,9 @@ class MChartOfAccountController extends Controller
      */
     public function index()
     {
-        $datas = MChartOfAccount::get();
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        $datas = MChartOfAccount::latest()->paginate();
+        $kategoris = MKategori::get();
+        return view('coa.index', compact('datas','kategoris'));
     }
 
     /**
@@ -51,28 +44,6 @@ class MChartOfAccountController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\MChartOfAccount  $mChartOfAccount
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        $data = MChartOfAccount::findOrFail($id);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\MChartOfAccount  $mChartOfAccount
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        $data = MChartOfAccount::findOrFail($id);
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -81,11 +52,15 @@ class MChartOfAccountController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->validate($request, [
+        $validataion = $this->validate($request, [
             'kategori_id'   =>  'required',
-            'kode'          =>  'required|unique:m_chart_of_accounts',
+            'kode'          =>  'required|unique:m_chart_of_accounts,kode,' . $id,
             'nama'          =>  'required|string|max:191' 
         ]);
+
+        // if($validataion->fails()) {
+        //     return redirect()->back();
+        // }
 
         $m_chart_of_account = MChartOfAccount::findOrFail($id);
 
@@ -94,7 +69,6 @@ class MChartOfAccountController extends Controller
             'kode'          =>  $request->kode,
             'nama'          =>  $request->nama,
         ]);
-
         return redirect()->route('coa.index');
     }
 
@@ -106,8 +80,7 @@ class MChartOfAccountController extends Controller
      */
     public function destroy($id)
     {
-        MChartOfAccount::find($id)->delete();
-        
+        MChartOfAccount::find($id)->delete();     
         return redirect()->route('coa.index');
     }
 }

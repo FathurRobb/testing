@@ -66,7 +66,7 @@
                         <div class="modal-body">
                             <div class="form-group has-info">
                                 <label for="nama">Kategori</label>
-                                <input type="text" class="form-control" id="nama" name="nama">
+                                <input type="text" class="form-control" id="nama" name="nama" required>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -94,7 +94,7 @@
                             <div class="modal-body">
                                 <div class="form-group has-info">
                                     <label for="nama">Kategori</label>
-                                    <input type="text" class="form-control" id="nama" name="nama" value="{{ $data->nama }}">
+                                    <input type="text" class="form-control" id="nama" name="nama" value="{{ $data->nama }}" required>
                                 </div>
                             </div>
                             <div class="modal-footer">

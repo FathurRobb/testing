@@ -36,18 +36,6 @@ class MKategoriController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\MKategori  $mKategori
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        $data = MKategori::findOrFail($id);
-        return view('kategori.edit', compact('data'));
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
