@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\TbTransaksi;
+use App\Models\MChartOfAccount;
 use Illuminate\Http\Request;
 
 class TbTransaksiController extends Controller
@@ -15,6 +16,7 @@ class TbTransaksiController extends Controller
     public function index()
     {
         $datas = TbTransaksi::get();
+        return view('transaksi.index', compact('datas'));
     }
 
     /**
@@ -24,7 +26,8 @@ class TbTransaksiController extends Controller
      */
     public function create()
     {
-        //
+        $coas = MChartOfAccount::get();
+        return view("transaksi.create", compact('coas'));
     }
 
     /**
@@ -37,16 +40,16 @@ class TbTransaksiController extends Controller
     {
         $this->validate($request, [
             'chart_of_account_id'   =>  'required',
-            'tanggal'               =>  'required|unique:m_chart_of_accounts',
-            'deskripsi'             =>  'required|string|max:191' 
+            'tanggal'               =>  'required',
+            'deskripsi'             =>  'required'
         ]);
 
         TbTransaksi::create([
             'chart_of_account_id'   =>  $request->chart_of_account_id,
             'tanggal'               =>  $request->tanggal,
             'deskripsi'             =>  $request->deskripsi,
-            'debit'                 =>  $request->debit,
-            'credit'                =>  $request->credit
+            'debit'                 =>  str_replace('.', '', $request->debit),
+            'credit'                =>  $request->credit ? str_replace('.', '', $request->credit) : $request->credit
         ]);
 
         return redirect()->route('transaksi.index');
@@ -72,6 +75,8 @@ class TbTransaksiController extends Controller
     public function edit($id)
     {
         $data = TbTransaksi::findOrFail($id);
+        $coas = MChartOfAccount::get();
+        return view("transaksi.edit", compact('data','coas'));
     }
 
     /**
@@ -85,8 +90,8 @@ class TbTransaksiController extends Controller
     {
         $this->validate($request, [
             'chart_of_account_id'   =>  'required',
-            'tanggal'               =>  'required|unique:m_chart_of_accounts',
-            'deskripsi'             =>  'required|string|max:191' 
+            'tanggal'               =>  'required',
+            'deskripsi'             =>  'required' 
         ]);
 
         $m_chart_of_account = TbTransaksi::findOrFail($id);
@@ -95,8 +100,8 @@ class TbTransaksiController extends Controller
             'chart_of_account_id'   =>  $request->chart_of_account_id,
             'tanggal'               =>  $request->tanggal,
             'deskripsi'             =>  $request->deskripsi,
-            'debit'                 =>  $request->debit,
-            'credit'                =>  $request->credit
+            'debit'                 =>  str_replace('.', '', $request->debit),
+            'credit'                =>  $request->credit ? str_replace('.', '', $request->credit) : $request->credit
         ]);
 
         return redirect()->route('transaksi.index');

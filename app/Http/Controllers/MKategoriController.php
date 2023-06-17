@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\MKategori;
 use Illuminate\Http\Request;
-use DB;
 
 class MKategoriController extends Controller
 {
@@ -33,6 +32,12 @@ class MKategoriController extends Controller
 
         MKategori::create($request->all());
         return redirect()->route('kategori.index');
+    }
+
+    public function edit($id)
+    {
+        $data = MKategori::findOrFail($id);
+        return view('kategori.edit', compact('data'));
     }
 
     /**

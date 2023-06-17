@@ -23,8 +23,8 @@
             <p>Chart of Account</p>
           </a>
         </li>
-        <li class="nav-item ">
-          <a class="nav-link" href="./typography.html">
+        <li class="nav-item {{ (request()->is('transaksi*')) ? 'active': ''}}">
+          <a class="nav-link" href="/transaksi">
             <i class="material-icons">account_balance_wallet</i>
             <p>Transaksi</p>
           </a>

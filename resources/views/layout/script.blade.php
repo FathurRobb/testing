@@ -219,3 +219,4 @@
 
     });
 </script>
+@stack('js')

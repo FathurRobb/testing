@@ -29,10 +29,10 @@
                                         <td>{{ $i }}</td>
                                         <td>{{ $data->nama }}</td>
                                         <td>
-                                            <button type="button" class="btn btn-outline-success btn-sm" data-toggle="modal" data-target="#editModal{{ $data->id }}">
+                                            <a type="button" class="btn btn-outline-success btn-sm" id="editButton" data-toggle="modal" data-target="#editModal" data-attr="{{ route('kategori.edit', $data->id) }}">
                                                 <i class="material-icons">edit</i>
-                                            </button>
-                                            <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#deleteModal{{ $data->id }}">
+                                            </a>
+                                            <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#deleteModal" data-url="{{ route('kategori.destroy', $data->id) }}" data-kategorinama="{{ $data->nama }}">
                                                 <i class="material-icons">delete</i>
                                             </button>                                 
                                         </td>
@@ -78,60 +78,72 @@
                 </div>
             </form>
             {{-- Modal Edit --}}
-            @foreach ($datas as $data)
-            <form action="{{ route('kategori.update', $data->id) }}" method="post">
+            <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document" id="editContent">
+                    <div class="modal-content">
+                        
+                    </div>
+                </div>
+            </div>
+            {{-- Modal Delete --}}
+            <form action="" method="post" id="delete-form">
                 @csrf
-                @method('PUT')
-                <div class="modal fade" id="editModal{{ $data->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                @method('DELETE')
+                <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">Form Edit Data</h5>
+                                <h5 class="modal-title" id="exampleModalLabel">Peringatan</h5>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
                             <div class="modal-body">
-                                <div class="form-group has-info">
-                                    <label for="nama">Kategori</label>
-                                    <input type="text" class="form-control" id="nama" name="nama" value="{{ $data->nama }}" required>
-                                </div>
+                                Apakah anda yakin untuk menghapus kategori <b><span id="kategori-nama"></span></b> ?
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
-                                <button type="submit" class="btn btn-info">Perbaharui Data</button>
+                                <button type="submit" class="btn btn-info">Ya</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </form>
-            @endforeach
-            {{-- Modal Delete --}}
-            @foreach ($datas as $data)
-                <form action="{{ route('kategori.destroy', $data->id) }}" method="post">
-                    @csrf
-                    @method('DELETE')
-                    <div class="modal fade" id="deleteModal{{ $data->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLabel">Peringatan</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    Apakah anda yakin menghapus kategori <b>{{ $data->nama }}</b> ?
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
-                                    <button type="submit" class="btn btn-info">Ya</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            @endforeach
         </div>
     </div>
 @endsection
+
+@push('js')
+    <script>
+        $('#deleteModal').on('show.bs.modal', function (event) {
+            let url = $(event.relatedTarget).data('url') 
+            let kategoriNama = $(event.relatedTarget).data('kategorinama') 
+            document.getElementById("kategori-nama").innerHTML = kategoriNama;  
+            document.getElementById("delete-form").setAttribute('action', url);
+        });
+
+        $(document).on('click', '#editButton', function(event) {
+            event.preventDefault();
+            let href = $(this).attr('data-attr');
+            $.ajax({
+                url: href
+                , beforeSend: function() {
+                    $('#loader').show();
+                },
+                // return the result
+                success: function(result) {
+                    $('#editModal').modal("show");
+                    $('#editContent').html(result).show();
+                }
+                , complete: function() {
+                    $('#loader').hide();
+                }
+                , error: function(jqXHR, testStatus, error) {
+                    alert("Page " + href + " cannot open. Error:" + error);
+                    $('#loader').hide();
+                }
+                , timeout: 8000
+            })
+        });
+    </script>
+@endpush

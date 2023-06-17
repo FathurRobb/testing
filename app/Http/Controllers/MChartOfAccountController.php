@@ -15,7 +15,7 @@ class MChartOfAccountController extends Controller
      */
     public function index()
     {
-        $datas = MChartOfAccount::latest()->paginate();
+        $datas = MChartOfAccount::latest()->paginate(10);
         $kategoris = MKategori::get();
         return view('coa.index', compact('datas','kategoris'));
     }
@@ -43,6 +43,13 @@ class MChartOfAccountController extends Controller
         return redirect()->route('coa.index');
     }
 
+    public function edit($id)
+    {
+        $data = MChartOfAccount::findOrFail($id);
+        $kategoris = MKategori::get();
+        return view('coa.edit', compact('data','kategoris'));
+    }
+
     /**
      * Update the specified resource in storage.
      *
@@ -52,15 +59,15 @@ class MChartOfAccountController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $validataion = $this->validate($request, [
+        $validation = $this->validate($request, [
             'kategori_id'   =>  'required',
             'kode'          =>  'required|unique:m_chart_of_accounts,kode,' . $id,
             'nama'          =>  'required|string|max:191' 
         ]);
 
-        // if($validataion->fails()) {
-        //     return redirect()->back();
-        // }
+        if($validation->fails()) {
+            return redirect()->route('coa.edit',$id);
+        }
 
         $m_chart_of_account = MChartOfAccount::findOrFail($id);
 

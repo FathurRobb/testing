@@ -12,13 +12,14 @@ class TbTransaksi extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'chart_of_account_id',
         'tanggal',
         'deskripsi',
         'debit',
         'credit'
     ];
 
-    public function chart_account()
+    public function chart_of_account()
     {
         return $this->belongsTo(MChartOfAccount::class);
     }
