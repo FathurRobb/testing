@@ -30,7 +30,7 @@
                                         <td>{{ $data->nama }}</td>
                                         <td>
                                             <a type="button" class="btn btn-outline-success btn-sm" id="editButton" data-toggle="modal" data-target="#editModal" data-attr="{{ route('kategori.edit', $data->id) }}">
-                                                <i class="material-icons">edit</i>
+                                                <i class="material-icons" style="color:#4caf50;">edit</i>
                                             </a>
                                             <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#deleteModal" data-url="{{ route('kategori.destroy', $data->id) }}" data-kategorinama="{{ $data->nama }}">
                                                 <i class="material-icons">delete</i>

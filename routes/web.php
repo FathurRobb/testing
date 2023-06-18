@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MKategoriController;
 use App\Http\Controllers\MChartOfAccountController;
 use App\Http\Controllers\TbTransaksiController;
@@ -16,10 +17,12 @@ use App\Http\Controllers\TbTransaksiController;
 |
 */
 
-Route::get('/', function () {
-    // return view('welcome');
-    return view('layout.template');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+
+Route::get('/', [DashboardController::class, 'index']);
+Route::get('export', [DashboardController::class, 'export'])->name('export');
 
 Route::resource('kategori', MKategoriController::class);
 Route::resource('coa', MChartOfAccountController::class);

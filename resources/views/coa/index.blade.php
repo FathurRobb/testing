@@ -34,7 +34,7 @@
                                         <td>{{ $data->kategori->nama }}</td>
                                         <td>
                                             <a type="button" class="btn btn-outline-success btn-sm" id="editButton" data-toggle="modal" data-target="#editModal" data-attr="{{ route('coa.edit', $data->id) }}">
-                                                <i class="material-icons">edit</i>
+                                                <i class="material-icons"  style="color:#4caf50;">edit</i>
                                             </a>
                                             <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#deleteModal" data-url="{{ route('coa.destroy', $data->id) }}" data-coanama="{{ $data->nama }}">
                                                 <i class="material-icons">delete</i>
@@ -44,7 +44,7 @@
                                     <?php $i++; ?>
                                 @empty
                                     <tr>
-                                        <td colspan="3">Data Chart Of Account Belum Tersedia</td>
+                                        <td colspan="5">Data Chart Of Account Belum Tersedia</td>
                                     </tr>
                                 @endforelse
                             </tbody>
