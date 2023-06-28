@@ -12,6 +12,6 @@ class MKategori extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'nama'
+        'nama','type'
     ];
 }

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <link rel="apple-touch-icon" sizes="76x76" href="{{asset('assets')}}/img/apple-icon.png">
     <link rel="icon" type="image/png" href="{{asset('assets')}}/img/favicon.png">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>@yield('title')</title>
     <!--     Fonts and icons     -->
@@ -14,7 +14,8 @@
     <link href="{{asset('assets')}}/css/material-dashboard.css?v=2.1.2" rel="stylesheet" />
     <!-- CSS Just for demo purpose, don't include it in your project -->
     <link href="{{asset('assets')}}/demo/demo.css" rel="stylesheet" />
-
+    <!-- TOAST -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.0/css/toastr.css" rel="stylesheet" />
 </head>
 <body>
     <div class="wrapper ">

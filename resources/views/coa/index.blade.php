@@ -36,7 +36,7 @@
                                             <a type="button" class="btn btn-outline-success btn-sm" id="editButton" data-toggle="modal" data-target="#editModal" data-attr="{{ route('coa.edit', $data->id) }}">
                                                 <i class="material-icons"  style="color:#4caf50;">edit</i>
                                             </a>
-                                            <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#deleteModal" data-url="{{ route('coa.destroy', $data->id) }}" data-coanama="{{ $data->nama }}">
+                                            <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#deleteModal" data-id="{{ $data->id }}" data-coanama="{{ $data->nama }}">
                                                 <i class="material-icons">delete</i>
                                             </button>                                 
                                         </td>
@@ -56,7 +56,7 @@
                 </div>
             </div>
             {{-- Modal Add --}}
-            <form method="POST" action="{{ route('coa.store') }}" enctype="multipart/form-data">
+            <form id="createForm">
                 @csrf
                 <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog" role="document">
@@ -71,9 +71,7 @@
                             <div class="form-group has-info">
                                 <label for="kode">Kode</label>
                                 <input type="number" class="form-control" id="kode" name="kode" required>
-                                @if ($errors->has('kode'))
-                                    <span class="text-danger">{{ $errors->first('kode') }}</span>
-                                @endif
+                                <span class="text-danger d-none" id="kode-message"></span>
                             </div>
                             <div class="form-group has-info">
                                 <label for="nama">Nama</label>
@@ -91,7 +89,7 @@
                         </div>
                         <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-info">Simpan</button>
+                        <button type="submit" class="btn btn-info" id="saveBtn">Simpan</button>
                         </div>
                     </div>
                     </div>
@@ -106,9 +104,6 @@
                 </div>
             </div>
             {{-- Modal Delete --}}
-            <form action="" method="post" id="delete-form">
-                @csrf
-                @method('DELETE')
                 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
@@ -119,27 +114,84 @@
                                 </button>
                             </div>
                             <div class="modal-body">
-                                Apakah anda yakin untuk menghapus data <b><span id="coa-nama"></span></b> ?
+                                Apakah anda yakin untuk menghapus data <span hidden id="coa-id"></span><b><span id="coa-nama"></span></b> ?
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
-                                <button type="submit" class="btn btn-info">Ya</button>
+                                <button type="submit" class="btn btn-info" id="deleteBtn">Ya</button>
                             </div>
                         </div>
                     </div>
                 </div>
-            </form>
         </div>
     </div>
 @endsection
 
 @push('js')
     <script>
+        $(function () {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+
+            toastr.options.timeout = 10000;
+
+            $('#saveBtn').click(function (e) {
+                e.preventDefault();
+                $(this).html('Sending...');
+
+                $.ajax({
+                    data: $('#createForm').serialize(),
+                    url: "{{ route('coa.store') }}",
+                    type: "POST",
+                    dataType: 'json',
+                    success: function (data) {
+                        $('#createForm').trigger("reset");
+                        $('#kode-message').addClass("d-none");
+                        $('#addModal').modal("hide");
+                        $('#table').load(document.URL +  ' #table');
+                        toastr.success(data.success);
+                    },
+                    error: function (data) {
+                        if (data.responseJSON.errors.kode) {
+                            document.getElementById("kode-message").classList.remove("d-none")
+                            document.getElementById("kode-message").innerHTML = data.responseJSON.errors.kode;  
+                        }
+                        toastr.error(data.responseJSON.message);
+                        $('#saveBtn').html('Save Changes');
+                    }
+                });
+            });
+
+            $('#deleteBtn').click(function (e) {
+                e.preventDefault();
+                $(this).html('Deleting...');
+                let coaId = $("#coa-id").html();
+
+                $.ajax({
+                    url: 'coa/'+coaId,
+                    type: "DELETE",
+                    dataType: 'json',
+                    success: function (data) {
+                        $('#deleteModal').modal("hide");
+                        $('#table').load(document.URL +  ' #table');
+                        toastr.success(data.success);
+                    },
+                    error: function (data) {
+                        toastr.error(data.responseJSON.message);
+                        $('#deleteBtn').html('Save Changes');
+                    }
+                });
+            });
+        });
+
         $('#deleteModal').on('show.bs.modal', function (event) {
-            let url = $(event.relatedTarget).data('url') 
+            let id = $(event.relatedTarget).data('id')  
             let coaNama = $(event.relatedTarget).data('coanama') 
             document.getElementById("coa-nama").innerHTML = coaNama;  
-            document.getElementById("delete-form").setAttribute('action', url);
+            document.getElementById("coa-id").innerHTML = id;
         });
 
         $(document).on('click', '#editButton', function(event) {

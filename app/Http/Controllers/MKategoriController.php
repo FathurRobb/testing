@@ -28,10 +28,11 @@ class MKategoriController extends Controller
     {
         $this->validate($request, [
             'nama'  =>  'required|string|max:191',
+            'type'  =>  'required',
         ]);
 
         MKategori::create($request->all());
-        return redirect()->route('kategori.index');
+        return response()->json(['success'=>'Category saved successfully.']);
     }
 
     public function edit($id)
@@ -51,10 +52,11 @@ class MKategoriController extends Controller
     {
         $this->validate($request, [
             'nama'  =>  'required|string|max:191',
+            'type'  =>  'required',
         ]);
 
         $data = MKategori::find($id)->update($request->all());
-        return redirect()->route('kategori.index');
+        return response()->json(['success'=>'Category updated successfully.']);
     }
 
     /**
@@ -66,6 +68,6 @@ class MKategoriController extends Controller
     public function destroy($id)
     {
         MKategori::find($id)->delete();
-        return redirect()->route('kategori.index');
+        return response()->json(['success'=>'Category deleted successfully.']);
     }
 }

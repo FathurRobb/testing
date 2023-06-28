@@ -40,7 +40,7 @@ class MChartOfAccountController extends Controller
             'nama'          =>  $request->nama,
         ]);
 
-        return redirect()->route('coa.index');
+        return response()->json(['success'=>'Chart of Accound saved successfully.']);
     }
 
     public function edit($id)
@@ -65,10 +65,6 @@ class MChartOfAccountController extends Controller
             'nama'          =>  'required|string|max:191' 
         ]);
 
-        if($validation->fails()) {
-            return redirect()->route('coa.edit',$id);
-        }
-
         $m_chart_of_account = MChartOfAccount::findOrFail($id);
 
         $m_chart_of_account->update([
@@ -76,7 +72,7 @@ class MChartOfAccountController extends Controller
             'kode'          =>  $request->kode,
             'nama'          =>  $request->nama,
         ]);
-        return redirect()->route('coa.index');
+        return response()->json(['success'=>'Chart of Account updated successfully.']);
     }
 
     /**
@@ -87,7 +83,7 @@ class MChartOfAccountController extends Controller
      */
     public function destroy($id)
     {
-        MChartOfAccount::find($id)->delete();     
-        return redirect()->route('coa.index');
+        MChartOfAccount::find($id)->delete(); 
+        return response()->json(['success'=>'Chart of Account deleted successfully.']);
     }
 }

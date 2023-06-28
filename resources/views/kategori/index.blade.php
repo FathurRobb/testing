@@ -20,6 +20,7 @@
                             <thead class="text-info">
                                 <th>No</th>
                                 <th>Nama</th>
+                                <th>Jenis Kategori</th>
                                 <th>Aksi</th>
                             </thead>
                             <tbody>
@@ -28,11 +29,12 @@
                                     <tr>                                        
                                         <td>{{ $i }}</td>
                                         <td>{{ $data->nama }}</td>
+                                        <td>{{ $data->type === 0 ? 'Outcome' : 'Income' }}</td>
                                         <td>
                                             <a type="button" class="btn btn-outline-success btn-sm" id="editButton" data-toggle="modal" data-target="#editModal" data-attr="{{ route('kategori.edit', $data->id) }}">
                                                 <i class="material-icons" style="color:#4caf50;">edit</i>
                                             </a>
-                                            <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#deleteModal" data-url="{{ route('kategori.destroy', $data->id) }}" data-kategorinama="{{ $data->nama }}">
+                                            <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#deleteModal" data-id="{{ $data->id }}" data-kategorinama="{{ $data->nama }}">
                                                 <i class="material-icons">delete</i>
                                             </button>                                 
                                         </td>
@@ -52,8 +54,7 @@
                 </div>
             </div>
             {{-- Modal Add --}}
-            <form method="POST" action="{{ route('kategori.store') }}" enctype="multipart/form-data">
-                @csrf
+            <form id="createForm">
                 <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog" role="document">
                       <div class="modal-content">
@@ -68,10 +69,18 @@
                                 <label for="nama">Kategori</label>
                                 <input type="text" class="form-control" id="nama" name="nama" required>
                             </div>
+                            <div class="form-group has-info">
+                                <label for="nama">Type</label>
+                                <select class="form-control" name="type" required>
+                                    <option value="" selected disabled>--Pilih Jenis Kategori--</option>
+                                    <option value="0">Outcome</option>
+                                    <option value="1">Income</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="modal-footer">
                           <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
-                          <button type="submit" class="btn btn-info">Simpan</button>
+                          <button type="submit" class="btn btn-info" id="saveBtn">Simpan</button>
                         </div>
                       </div>
                     </div>
@@ -86,9 +95,6 @@
                 </div>
             </div>
             {{-- Modal Delete --}}
-            <form action="" method="post" id="delete-form">
-                @csrf
-                @method('DELETE')
                 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
@@ -99,27 +105,79 @@
                                 </button>
                             </div>
                             <div class="modal-body">
-                                Apakah anda yakin untuk menghapus kategori <b><span id="kategori-nama"></span></b> ?
+                                Apakah anda yakin untuk menghapus kategori <span hidden id="kategori-id"></span> <b><span id="kategori-nama"></span></b> ?
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
-                                <button type="submit" class="btn btn-info">Ya</button>
+                                <button type="submit" class="btn btn-info" id="deleteBtn">Ya</button>
                             </div>
                         </div>
                     </div>
                 </div>
-            </form>
         </div>
     </div>
 @endsection
 
 @push('js')
     <script>
+        $(function () {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            
+            toastr.options.timeout = 10000;
+
+            $('#saveBtn').click(function (e) {
+                e.preventDefault();
+                $(this).html('Sending...');
+
+                $.ajax({
+                    data: $('#createForm').serialize(),
+                    url: "{{ route('kategori.store') }}",
+                    type: "POST",
+                    dataType: 'json',
+                    success: function (data) {
+                        $('#createForm').trigger("reset");
+                        $('#addModal').modal("hide");
+                        $('#table').load(document.URL +  ' #table');
+                        toastr.success(data.success);
+                    },
+                    error: function (data) {
+                        toastr.error(data.responseJSON.message);
+                        $('#saveBtn').html('Save Changes');
+                    }
+                });
+            });
+
+            $('#deleteBtn').click(function (e) {
+                e.preventDefault();
+                $(this).html('Deleting...');
+                let kategoriId = $("#kategori-id").html();
+
+                $.ajax({
+                    url: 'kategori/'+kategoriId,
+                    type: "DELETE",
+                    dataType: 'json',
+                    success: function (data) {
+                        $('#deleteModal').modal("hide");
+                        $('#table').load(document.URL +  ' #table');
+                        toastr.success(data.success);
+                    },
+                    error: function (data) {
+                        toastr.error(data.responseJSON.message);
+                        $('#deleteBtn').html('Save Changes');
+                    }
+                });
+            });
+        });
+
         $('#deleteModal').on('show.bs.modal', function (event) {
-            let url = $(event.relatedTarget).data('url') 
+            let id = $(event.relatedTarget).data('id') 
             let kategoriNama = $(event.relatedTarget).data('kategorinama') 
             document.getElementById("kategori-nama").innerHTML = kategoriNama;  
-            document.getElementById("delete-form").setAttribute('action', url);
+            document.getElementById("kategori-id").innerHTML = id;
         });
 
         $(document).on('click', '#editButton', function(event) {

@@ -20,7 +20,7 @@ class CreateTbTransaksisTable extends Migration
             $table->date('tanggal');
             $table->text('deskripsi');
             $table->integer('debit')->default(0);
-            $table->integer('credit')->nullable();
+            $table->integer('credit')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

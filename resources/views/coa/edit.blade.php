@@ -1,7 +1,5 @@
 {{-- Modal Edit --}}
-<form action="{{ route('coa.update', $data->id) }}" method="post">
-    @csrf
-    @method('PUT')
+<form id="editForm">
     <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Form Edit Data</h5>
@@ -10,9 +8,11 @@
             </button>
         </div>
         <div class="modal-body">
+            <span hidden id="id-update">{{$data->id}}</span>
             <div class="form-group has-info">
                 <label for="kode">Kode</label>
-                <input type="text" class="form-control" id="kode" name="kode" value="{{ $data->kode }}" disabled>
+                <input type="text" class="form-control" id="kode" name="kode" value="{{ $data->kode }}">
+                <span class="text-danger d-none" id="kode-message-update"></span>
             </div>
             <div class="form-group has-info">
                 <label for="nama">Nama</label>
@@ -29,7 +29,37 @@
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
-            <button type="submit" class="btn btn-info">Perbaharui Data</button>
+            <button type="submit" class="btn btn-info" id="editBtn">Perbaharui Data</button>
         </div>
     </div>
 </form>
+
+<script>
+    toastr.options.timeout = 10000;
+    $('#editBtn').click(function (e) {
+        e.preventDefault();
+        $(this).html('Updating...');
+        let coaId = $("#id-update").html();
+
+        $.ajax({
+            data: $('#editForm').serialize(),
+            url: 'coa/'+coaId,
+            type: "PUT",
+            dataType: 'json',
+            success: function (data) {
+                $('#kode-message-update').addClass("d-none");
+                $('#editModal').modal("hide");
+                $('#table').load(document.URL +  ' #table');
+                toastr.success(data.success);
+            },
+            error: function (data) {
+                if (data.responseJSON.errors.kode) {
+                    document.getElementById("kode-message-update").classList.remove("d-none")
+                    document.getElementById("kode-message-update").innerHTML = data.responseJSON.errors.kode;  
+                }
+                toastr.error(data.responseJSON.message);
+                $('#editBtn').html('Save Changes');
+            }
+        });
+    });
+</script>
