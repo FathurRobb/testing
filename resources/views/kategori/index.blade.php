@@ -16,7 +16,7 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table" id="table">
+                        <table class="table data-table">
                             <thead class="text-info">
                                 <th>No</th>
                                 <th>Nama</th>
@@ -24,33 +24,9 @@
                                 <th>Aksi</th>
                             </thead>
                             <tbody>
-                                <?php $i = 1; ?>
-                                @forelse ($datas as $data)
-                                    <tr>                                        
-                                        <td>{{ $i }}</td>
-                                        <td>{{ $data->nama }}</td>
-                                        <td>{{ $data->type === 0 ? 'Outcome' : 'Income' }}</td>
-                                        <td>
-                                            <a type="button" class="btn btn-outline-success btn-sm" id="editButton" data-toggle="modal" data-target="#editModal" data-attr="{{ route('kategori.edit', $data->id) }}">
-                                                <i class="material-icons" style="color:#4caf50;">edit</i>
-                                            </a>
-                                            <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#deleteModal" data-id="{{ $data->id }}" data-kategorinama="{{ $data->nama }}">
-                                                <i class="material-icons">delete</i>
-                                            </button>                                 
-                                        </td>
-                                    </tr>
-                                    <?php $i++; ?>
-                                @empty
-                                    <tr>
-                                        <td colspan="3">Data Kategori Belum Tersedia</td>
-                                    </tr>
-                                @endforelse
                             </tbody>
                         </table>
                     </div>
-                </div>
-                <div class="mx-auto d-block">
-                    {{ $datas->links() }}
                 </div>
             </div>
             {{-- Modal Add --}}
@@ -70,7 +46,7 @@
                                 <input type="text" class="form-control" id="nama" name="nama" required>
                             </div>
                             <div class="form-group has-info">
-                                <label for="nama">Type</label>
+                                <label for="nama" style="color: #00bcd4">Type</label>
                                 <select class="form-control" name="type" required>
                                     <option value="" selected disabled>--Pilih Jenis Kategori--</option>
                                     <option value="0">Outcome</option>
@@ -127,6 +103,20 @@
                 }
             });
             
+            let table = $('.data-table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: "{{ route('kategori.index') }}",
+                columns: [
+                    {data: 'DT_RowIndex'},
+                    {data: 'nama' },
+                    {data: 'type', render: function(data,type,row){
+                        return (data === 1) ? "Income" : "Outcome"
+                    } },
+                    {data: 'action', orderable: false, searchable: false},
+                ]
+            });
+
             toastr.options.timeout = 10000;
 
             $('#saveBtn').click(function (e) {
@@ -141,7 +131,7 @@
                     success: function (data) {
                         $('#createForm').trigger("reset");
                         $('#addModal').modal("hide");
-                        $('#table').load(document.URL +  ' #table');
+                        table.draw();
                         toastr.success(data.success);
                     },
                     error: function (data) {
@@ -162,7 +152,7 @@
                     dataType: 'json',
                     success: function (data) {
                         $('#deleteModal').modal("hide");
-                        $('#table').load(document.URL +  ' #table');
+                        table.draw();
                         toastr.success(data.success);
                     },
                     error: function (data) {

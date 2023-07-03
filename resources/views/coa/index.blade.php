@@ -16,7 +16,7 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table" id="table">
+                        <table class="table data-table">
                             <thead class="text-info">
                                 <th>No</th>
                                 <th>Kode</th>
@@ -25,39 +25,13 @@
                                 <th>Aksi</th>
                             </thead>
                             <tbody>
-                                <?php $i = 1; ?>
-                                @forelse ($datas as $data)
-                                    <tr>                                        
-                                        <td>{{ $i }}</td>
-                                        <td>{{ $data->kode }}</td>
-                                        <td>{{ $data->nama }}</td>
-                                        <td>{{ $data->kategori->nama }}</td>
-                                        <td>
-                                            <a type="button" class="btn btn-outline-success btn-sm" id="editButton" data-toggle="modal" data-target="#editModal" data-attr="{{ route('coa.edit', $data->id) }}">
-                                                <i class="material-icons"  style="color:#4caf50;">edit</i>
-                                            </a>
-                                            <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#deleteModal" data-id="{{ $data->id }}" data-coanama="{{ $data->nama }}">
-                                                <i class="material-icons">delete</i>
-                                            </button>                                 
-                                        </td>
-                                    </tr>
-                                    <?php $i++; ?>
-                                @empty
-                                    <tr>
-                                        <td colspan="5">Data Chart Of Account Belum Tersedia</td>
-                                    </tr>
-                                @endforelse
                             </tbody>
                         </table>
                     </div>
                 </div>
-                <div class="mx-auto d-block">
-                    {{ $datas->links() }}
-                </div>
             </div>
             {{-- Modal Add --}}
             <form id="createForm">
-                @csrf
                 <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog" role="document">
                     <div class="modal-content">
@@ -78,7 +52,7 @@
                                 <input type="text" class="form-control" id="nama" name="nama" required>
                             </div>
                             <div class="form-group has-info">
-                                <label for="kategori">Kategori</label>
+                                <label for="kategori" style="color: #00bcd4">Kategori</label>
                                 <select class="form-control" id="kategori_id" name="kategori_id" required>
                                     <option value="" selected disabled>--Pilih Kategori--</option>
                                     @foreach ($kategoris as $kategori)
@@ -136,6 +110,19 @@
                 }
             });
 
+            let table = $('.data-table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: "{{ route('coa.index') }}",
+                columns: [
+                    {data: 'DT_RowIndex'},
+                    {data: 'kode' },
+                    {data: 'nama' },
+                    {data: 'kategori.nama'},
+                    {data: 'action', orderable: false, searchable: false},
+                ]
+            });
+
             toastr.options.timeout = 10000;
 
             $('#saveBtn').click(function (e) {
@@ -151,7 +138,7 @@
                         $('#createForm').trigger("reset");
                         $('#kode-message').addClass("d-none");
                         $('#addModal').modal("hide");
-                        $('#table').load(document.URL +  ' #table');
+                        table.draw();
                         toastr.success(data.success);
                     },
                     error: function (data) {
@@ -176,7 +163,7 @@
                     dataType: 'json',
                     success: function (data) {
                         $('#deleteModal').modal("hide");
-                        $('#table').load(document.URL +  ' #table');
+                        table.draw();
                         toastr.success(data.success);
                     },
                     error: function (data) {
@@ -218,11 +205,4 @@
             })
         });
     </script>
-     @if (count($errors) > 0)
-     <script type="text/javascript">
-         $( document ).ready(function() {
-              $('#addModal').modal('show');
-         });
-     </script>
-   @endif
 @endpush

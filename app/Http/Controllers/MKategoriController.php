@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MKategori;
 use Illuminate\Http\Request;
+use DataTables;
 
 class MKategoriController extends Controller
 {
@@ -12,10 +13,25 @@ class MKategoriController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $datas = MKategori::latest()->paginate(10);
-        return view('kategori.index', compact('datas'));
+        if ($request->ajax()) {
+            $datas = MKategori::latest()->get();
+            return DataTables::of($datas)
+                            ->addIndexColumn()
+                            ->addColumn('action', function ($row) {
+                                $btn = '<a type="button" class="btn btn-outline-success btn-sm" id="editButton" data-toggle="modal" data-target="#editModal" data-attr="kategori/'.$row->id.'/edit">
+                                            <i class="material-icons" style="color:#4caf50;">edit</i>
+                                        </a>';
+                                $btn = $btn.'<button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#deleteModal" data-id="'.$row->id.'" data-kategorinama="'.$row->nama.'">
+                                            <i class="material-icons">delete</i>
+                                        </button>'; 
+                                return $btn;
+                            })
+                            ->rawColumns(['action'])
+                            ->make(true);
+        }
+        return view('kategori.index');
     }
 
     /**

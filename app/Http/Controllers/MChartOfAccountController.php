@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\MChartOfAccount;
 use App\Models\MKategori;
 use Illuminate\Http\Request;
+use DataTables;
 
 class MChartOfAccountController extends Controller
 {
@@ -13,11 +14,26 @@ class MChartOfAccountController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $datas = MChartOfAccount::latest()->paginate(10);
+        if ($request->ajax()) {
+            $datas = MChartOfAccount::with('kategori')->latest()->get();
+            return DataTables::of($datas)
+                            ->addIndexColumn()
+                            ->addColumn('action', function ($row) {
+                                $btn = '<a type="button" class="btn btn-outline-success btn-sm" id="editButton" data-toggle="modal" data-target="#editModal" data-attr="coa/'.$row->id.'/edit">
+                                            <i class="material-icons"  style="color:#4caf50;">edit</i>
+                                        </a>';
+                                $btn = $btn.'<button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#deleteModal" data-id="'.$row->id.'" data-coanama="'.$row->nama.'">
+                                                <i class="material-icons">delete</i>
+                                            </button>'; 
+                                return $btn;
+                            })
+                            ->rawColumns(['action'])
+                            ->make(true);
+        }
         $kategoris = MKategori::get();
-        return view('coa.index', compact('datas','kategoris'));
+        return view('coa.index', compact('kategoris'));
     }
 
     /**

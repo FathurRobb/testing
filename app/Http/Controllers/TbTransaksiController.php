@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\TbTransaksi;
 use App\Models\MChartOfAccount;
+use App\Models\MKategori;
 use Illuminate\Http\Request;
 
 class TbTransaksiController extends Controller
@@ -16,7 +17,8 @@ class TbTransaksiController extends Controller
     public function index()
     {
         $datas = TbTransaksi::get();
-        return view('transaksi.index', compact('datas'));
+        $kategoris = MKategori::with('chart_of_account')->get();
+        return view('transaksi.index', compact('datas','kategoris'));
     }
 
     /**
@@ -52,7 +54,7 @@ class TbTransaksiController extends Controller
             'credit'                =>  $request->credit ? str_replace('.', '', $request->credit) : $request->credit
         ]);
 
-        return redirect()->route('transaksi.index');
+        return response()->json(['success'=>'Transaction saved successfully.']);
     }
 
     /**
@@ -75,8 +77,8 @@ class TbTransaksiController extends Controller
     public function edit($id)
     {
         $data = TbTransaksi::findOrFail($id);
-        $coas = MChartOfAccount::get();
-        return view("transaksi.edit", compact('data','coas'));
+        $kategoris = MKategori::with('chart_of_account')->get();
+        return view("transaksi.edit", compact('data','kategoris'));
     }
 
     /**
@@ -104,7 +106,7 @@ class TbTransaksiController extends Controller
             'credit'                =>  $request->credit ? str_replace('.', '', $request->credit) : $request->credit
         ]);
 
-        return redirect()->route('transaksi.index');
+        return response()->json(['success'=>'Transaction updated successfully.']);
     }
 
     /**
@@ -116,7 +118,6 @@ class TbTransaksiController extends Controller
     public function destroy($id)
     {
         TbTransaksi::find($id)->delete();
-        
-        return redirect()->route('transaksi.index');
+        return response()->json(['success'=>'Transaction deleted successfully.']);
     }
 }

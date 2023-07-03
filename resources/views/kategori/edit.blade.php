@@ -10,7 +10,7 @@
         <div class="modal-body">
             <span hidden id="id-update">{{$data->id}}</span>
             <div class="form-group has-info">
-                <label for="nama">Kategori</label>
+                <label for="nama" style="color: #00bcd4">Kategori</label>
                 <input type="text" class="form-control" id="nama" name="nama" value="{{$data->nama}}">
             </div>
             <div class="form-group has-info">
@@ -42,7 +42,21 @@
             dataType: 'json',
             success: function (data) {
                 $('#editModal').modal("hide");
-                $('#table').load(document.URL +  ' #table');
+                // $('.data-table').DataTable({
+                //     destroy: true,
+                //     processing: true,
+                //     serverSide: true,
+                //     ajax: "{{ route('kategori.index') }}",
+                //     columns: [
+                //         {data: 'DT_RowIndex'},
+                //         {data: 'nama' },
+                //         {data: 'type', render: function(data,type,row){
+                //             return (data === 1) ? "Income" : "Outcome"
+                //         } },
+                //         {data: 'action', orderable: false, searchable: false},
+                //     ]
+                // }).draw();
+                window.location = "{{ route('kategori.index') }}";
                 toastr.success(data.success);
             },
             error: function (data) {

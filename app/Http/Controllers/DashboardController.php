@@ -29,6 +29,27 @@ class DashboardController extends Controller
                 array_push($namas, $record->nama);
             }
         }
+        // $checkDate = [];
+        // foreach ($tanggals as $tgl) {
+        //     $checkDate[$tgl] = 0;
+        //     };
+        // // dd($checkDate);
+        // $result = [];
+        // foreach ($namas as $nm) {
+        //     foreach ($recordsProfitByName[$nm] as $tes => $val) {
+        //         // dd($recordsProfitByName[$nm]);
+        //         // foreach ($tanggals as $tgl) {
+        //             // dd($tgl);
+        //             // if ($tes != $tgl) {
+        //             //     $recordsProfitByName[$nm][$tgl] = 0;
+        //             // } 
+        //             $result = array_merge($recordsProfitByName[$nm], $checkDate);
+        //             dd($result);
+                    
+        //         // }
+        //     }
+        // }
+        // dd($result);
         return view('dashboard', compact('datas','namas','tanggals','recordsProfitByName'));
     }
 

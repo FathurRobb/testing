@@ -15,7 +15,7 @@
                 <span class="text-danger d-none" id="kode-message-update"></span>
             </div>
             <div class="form-group has-info">
-                <label for="nama">Nama</label>
+                <label for="nama" style="color: #00bcd4">Nama</label>
                 <input type="text" class="form-control" id="nama" name="nama" value="{{ $data->nama }}">
             </div>
             <div class="form-group has-info">
@@ -49,7 +49,20 @@
             success: function (data) {
                 $('#kode-message-update').addClass("d-none");
                 $('#editModal').modal("hide");
-                $('#table').load(document.URL +  ' #table');
+                // $('.data-table').DataTable({
+                //     destroy: true,
+                //     processing: true,
+                //     serverSide: true,
+                //     ajax: "{{ route('coa.index') }}",
+                //     columns: [
+                //         {data: 'DT_RowIndex'},
+                //         {data: 'kode' },
+                //         {data: 'nama' },
+                //         {data: 'kategori.nama'},
+                //         {data: 'action', orderable: false, searchable: false},
+                //     ]
+                // }).draw();
+                window.location = "{{ route('coa.index') }}";
                 toastr.success(data.success);
             },
             error: function (data) {

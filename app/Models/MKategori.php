@@ -14,4 +14,9 @@ class MKategori extends Model
     protected $fillable = [
         'nama','type'
     ];
+
+    public function chart_of_account()
+    {
+        return $this->hasMany(MChartOfAccount::class,'kategori_id');
+    }
 }
