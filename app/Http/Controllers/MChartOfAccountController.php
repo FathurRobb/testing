@@ -20,15 +20,6 @@ class MChartOfAccountController extends Controller
             $datas = MChartOfAccount::with('kategori')->latest()->get();
             return DataTables::of($datas)
                             ->addIndexColumn()
-                            ->addColumn('action', function ($row) {
-                                $btn = '<a type="button" class="btn btn-outline-success btn-sm" id="editButton" data-toggle="modal" data-target="#editModal" data-attr="coa/'.$row->id.'/edit">
-                                            <i class="material-icons"  style="color:#4caf50;">edit</i>
-                                        </a>';
-                                $btn = $btn.'<button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#deleteModal" data-id="'.$row->id.'" data-coanama="'.$row->nama.'">
-                                                <i class="material-icons">delete</i>
-                                            </button>'; 
-                                return $btn;
-                            })
                             ->rawColumns(['action'])
                             ->make(true);
         }
@@ -57,6 +48,12 @@ class MChartOfAccountController extends Controller
         ]);
 
         return response()->json(['success'=>'Chart of Accound saved successfully.']);
+    }
+
+    public function show($id)
+    {
+        $data = MChartOfAccount::findOrFail($id);
+        return response()->json(['success'=>$data]);
     }
 
     public function edit($id)

@@ -44,16 +44,16 @@
                         <div class="modal-body">
                             <div class="form-group has-info">
                                 <label for="kode">Kode</label>
-                                <input type="number" class="form-control" id="kode" name="kode" required>
+                                <input type="number" class="form-control" name="kode" required>
                                 <span class="text-danger d-none" id="kode-message"></span>
                             </div>
                             <div class="form-group has-info">
                                 <label for="nama">Nama</label>
-                                <input type="text" class="form-control" id="nama" name="nama" required>
+                                <input type="text" class="form-control" name="nama" required>
                             </div>
                             <div class="form-group has-info">
                                 <label for="kategori" style="color: #00bcd4">Kategori</label>
-                                <select class="form-control" id="kategori_id" name="kategori_id" required>
+                                <select class="form-control" name="kategori_id" required>
                                     <option value="" selected disabled>--Pilih Kategori--</option>
                                     @foreach ($kategoris as $kategori)
                                         <option value="{{ $kategori->id }}">{{ $kategori->nama }}</option>
@@ -72,9 +72,40 @@
             {{-- Modal Edit --}}
             <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document" id="editContent">
-                    <div class="modal-content">
-
-                    </div>
+                    <form id="editForm">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Form Edit Data</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <span hidden id="id-update"></span>
+                                <div class="form-group has-info">
+                                    <label for="kode">Kode</label>
+                                    <input type="text" class="form-control" id="kode" name="kode" value="">
+                                    <span class="text-danger d-none" id="kode-message-update"></span>
+                                </div>
+                                <div class="form-group has-info">
+                                    <label for="nama" style="color: #00bcd4">Nama</label>
+                                    <input type="text" class="form-control" id="nama" name="nama" value="">
+                                </div>
+                                <div class="form-group has-info">
+                                    <label for="kategori">Kategori</label>
+                                    <select class="form-control" id="kategori_id" name="kategori_id">
+                                        @foreach ($kategoris as $kategori)
+                                            <option value="{{ $kategori->id }}">{{ $kategori->nama }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-info" id="editBtn">Perbaharui Data</button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
             {{-- Modal Delete --}}
@@ -119,7 +150,11 @@
                     {data: 'kode' },
                     {data: 'nama' },
                     {data: 'kategori.nama'},
-                    {data: 'action', orderable: false, searchable: false},
+                    {data: 'action', render: function(data,type,row,meta) {
+                        let btn ='<a type="button" class="btn btn-outline-success btn-sm" id="editButton" data-toggle="modal" data-target="#editModal" data-id="'+row.id+'"><i class="material-icons" style="color:#4caf50;">edit</i></a>'
+                        btn = btn+'<button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#deleteModal" data-id="'+row.id+'" data-coanama="'+row.nama+'"><i class="material-icons">delete</i></button>'
+                        return btn
+                    },  orderable: false, searchable: false},
                 ]
             });
 
@@ -172,6 +207,33 @@
                     }
                 });
             });
+
+            $('#editBtn').click(function (e) {
+                e.preventDefault();
+                $(this).html('Updating...');
+                let coaId = $("#id-update").html();
+
+                $.ajax({
+                    data: $('#editForm').serialize(),
+                    url: 'coa/'+coaId,
+                    type: "PUT",
+                    dataType: 'json',
+                    success: function (data) {
+                        $('#kode-message-update').addClass("d-none");
+                        $('#editModal').modal("hide");
+                        table.draw();
+                        toastr.success(data.success);
+                    },
+                    error: function (data) {
+                        if (data.responseJSON.errors.kode) {
+                            document.getElementById("kode-message-update").classList.remove("d-none")
+                            document.getElementById("kode-message-update").innerHTML = data.responseJSON.errors.kode;  
+                        }
+                        toastr.error(data.responseJSON.message);
+                        $('#editBtn').html('Save Changes');
+                    }
+                });
+            });
         });
 
         $('#deleteModal').on('show.bs.modal', function (event) {
@@ -181,28 +243,47 @@
             document.getElementById("coa-id").innerHTML = id;
         });
 
-        $(document).on('click', '#editButton', function(event) {
-            event.preventDefault();
-            let href = $(this).attr('data-attr');
+        $('#editModal').on('show.bs.modal', function (event) {
+            let id = $(event.relatedTarget).data('id') 
+            document.getElementById("id-update").innerHTML = id;
             $.ajax({
-                url: href
-                , beforeSend: function() {
-                    $('#loader').show();
+                url: 'coa/'+id,
+                type: "GET",
+                dataType: 'json',
+                success: function (data) {
+                    $('#kode-message-update').addClass("d-none");
+                    $('#kode').val(data.success.kode);
+                    $('#nama').val(data.success.nama);
+                    $('#kategori_id').val(data.success.kategori_id);
                 },
-                // return the result
-                success: function(result) {
-                    $('#editModal').modal("show");
-                    $('#editContent').html(result).show();
+                error: function (data) {
+                    toastr.error(data.message);
                 }
-                , complete: function() {
-                    $('#loader').hide();
-                }
-                , error: function(jqXHR, testStatus, error) {
-                    alert("Page " + href + " cannot open. Error:" + error);
-                    $('#loader').hide();
-                }
-                , timeout: 8000
-            })
+             });
         });
+
+        // $(document).on('click', '#editButton', function(event) {
+        //     event.preventDefault();
+        //     let href = $(this).attr('data-attr');
+        //     $.ajax({
+        //         url: href
+        //         , beforeSend: function() {
+        //             $('#loader').show();
+        //         },
+        //         // return the result
+        //         success: function(result) {
+        //             $('#editModal').modal("show");
+        //             $('#editContent').html(result).show();
+        //         }
+        //         , complete: function() {
+        //             $('#loader').hide();
+        //         }
+        //         , error: function(jqXHR, testStatus, error) {
+        //             alert("Page " + href + " cannot open. Error:" + error);
+        //             $('#loader').hide();
+        //         }
+        //         , timeout: 8000
+        //     })
+        // });
     </script>
 @endpush

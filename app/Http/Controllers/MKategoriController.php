@@ -19,15 +19,6 @@ class MKategoriController extends Controller
             $datas = MKategori::latest()->get();
             return DataTables::of($datas)
                             ->addIndexColumn()
-                            ->addColumn('action', function ($row) {
-                                $btn = '<a type="button" class="btn btn-outline-success btn-sm" id="editButton" data-toggle="modal" data-target="#editModal" data-attr="kategori/'.$row->id.'/edit">
-                                            <i class="material-icons" style="color:#4caf50;">edit</i>
-                                        </a>';
-                                $btn = $btn.'<button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#deleteModal" data-id="'.$row->id.'" data-kategorinama="'.$row->nama.'">
-                                            <i class="material-icons">delete</i>
-                                        </button>'; 
-                                return $btn;
-                            })
                             ->rawColumns(['action'])
                             ->make(true);
         }
@@ -49,6 +40,12 @@ class MKategoriController extends Controller
 
         MKategori::create($request->all());
         return response()->json(['success'=>'Category saved successfully.']);
+    }
+
+    public function show($id)
+    {
+        $data = MKategori::findOrFail($id);
+        return response()->json(['success'=>$data]);
     }
 
     public function edit($id)

@@ -66,6 +66,7 @@ class TbTransaksiController extends Controller
     public function show($id)
     {
         $data = TbTransaksi::findOrFail($id);
+        return response()->json(['success'=>$data]);
     }
 
     /**

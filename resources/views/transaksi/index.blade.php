@@ -39,7 +39,7 @@
                                         <td>@currency($data->debit)</td>
                                         <td>@currency($data->credit)</td>
                                         <td>
-                                            <a type="button" class="btn btn-outline-success btn-sm" id="editButton" data-toggle="modal" data-target="#editModal" data-attr="{{ route('transaksi.edit', $data->id) }}">
+                                            <a type="button" class="btn btn-outline-success btn-sm" id="editButton" data-toggle="modal" data-target="#editModal" data-id="{{ $data->id }}">
                                                 <i class="material-icons"  style="color:#4caf50;">edit</i>
                                             </a>
                                             <button type="button" class="btn btn-outline-danger btn-sm" data-toggle="modal" data-target="#deleteModal" data-id="{{ $data->id }}">
@@ -72,11 +72,11 @@
                         <div class="modal-body">
                             <div class="form-group has-info">
                                 <label for="tanggal">Tanggal</label>
-                                <input type="date" class="form-control" id="tanggal" name="tanggal" value="{{ date('Y-m-d', strtotime(Carbon\Carbon::today()->toDateString())) }}" required>
+                                <input type="date" class="form-control" name="tanggal" value="{{ date('Y-m-d', strtotime(Carbon\Carbon::today()->toDateString())) }}" required>
                             </div>
                             <div class="form-group has-info">
                                 <label for="chart_of_account" style="color: #00bcd4">Chart Of Account</label>
-                                <select class="form-control" id="chart_of_account_id" name="chart_of_account_id" required>
+                                <select class="form-control" name="chart_of_account_id" required>
                                     <option value="" selected disabled>--Pilih Chart Account--</option>
                                     @foreach ($kategoris as $kategori)
                                         <optgroup label="{{$kategori->nama}}">
@@ -89,15 +89,15 @@
                             </div>
                             <div class="form-group has-info">
                                 <label for="debit">Debit</label>
-                                <input type="text" class="form-control" id="debit" name="debit" value="0" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0');" required>
+                                <input type="text" class="form-control debit" name="debit" value="0" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0');" required>
                             </div>
                             <div class="form-group has-info">
                                 <label for="credit">Credit</label>
-                                <input type="text" class="form-control" id="credit" name="credit" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0');">
+                                <input type="text" class="form-control credit" name="credit" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0');">
                             </div>
                             <div class="form-group has-info">
                                 <label for="deskripsi">Deskripsi</label>
-                                <textarea class="form-control" id="deskripsi" name="deskripsi" rows="5" required></textarea>
+                                <textarea class="form-control" name="deskripsi" rows="5" required></textarea>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -111,9 +111,51 @@
             {{-- Modal Edit --}}
             <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document" id="editContent">
-                    <div class="modal-content">
-
-                    </div>
+                    <form id="editForm">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Form Edit Data</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <span hidden id="id-update"></span>
+                                <div class="form-group has-info">
+                                    <label for="tanggal">Tanggal</label>
+                                    <input type="date" class="form-control" id="tanggal" name="tanggal" value="" required>
+                                </div>
+                                <div class="form-group has-info">
+                                    <label for="chart_of_account" style="color: #00bcd4">Chart Of Account</label>
+                                    <select class="form-control" id="chart_of_account_id" name="chart_of_account_id" required>
+                                        @foreach ($kategoris as $kategori)
+                                            <optgroup label="{{$kategori->nama}}">
+                                                @foreach ($kategori->chart_of_account as $coa)
+                                                    <option value="{{ $coa->id }}">{{ $coa->kode .' - '. $coa->nama }}</option>
+                                                @endforeach
+                                            </optgroup>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group has-info">
+                                    <label for="debit">Debit</label>
+                                    <input type="text" class="form-control debit" id="debit" name="debit" value="" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0');" required>
+                                </div>
+                                <div class="form-group has-info">
+                                    <label for="credit">Credit</label>
+                                    <input type="text" class="form-control credit" id="credit" name="credit" value="" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0');">
+                                </div>
+                                <div class="form-group has-info">
+                                    <label for="deskripsi">Deskripsi</label>
+                                    <textarea class="form-control" id="deskripsi" name="deskripsi" rows="5" required></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-info" id="editBtn">Perbaharui Data</button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
             {{-- Modal Delete --}}
@@ -146,7 +188,7 @@
             $('#example').DataTable();
         });
 
-        $('#debit').keyup(function(event) {
+        $('.debit').keyup(function(event) {
 
         // skip for arrow keys
         if(event.which >= 37 && event.which <= 40) return;
@@ -159,7 +201,7 @@
             });
         });
 
-        $('#credit').keyup(function(event) {
+        $('.credit').keyup(function(event) {
 
         // skip for arrow keys
         if(event.which >= 37 && event.which <= 40) return;
@@ -223,6 +265,28 @@
                     }
                 });
             });
+
+            $('#editBtn').click(function (e) {
+                e.preventDefault();
+                $(this).html('Updating...');
+                let transaksiId = $("#id-update").html();
+
+                $.ajax({
+                    data: $('#editForm').serialize(),
+                    url: 'transaksi/'+transaksiId,
+                    type: "PUT",
+                    dataType: 'json',
+                    success: function (data) {
+                        $('#editModal').modal("hide");
+                        $('#example').load(document.URL +  ' #example');
+                        toastr.success(data.success);
+                    },
+                    error: function (data) {
+                        toastr.error(data.responseJSON.message);
+                        $('#editBtn').html('Save Changes');
+                    }
+                });
+            });            
         });
 
         $('#deleteModal').on('show.bs.modal', function (event) {
@@ -230,28 +294,50 @@
             document.getElementById("transaksi-id").innerHTML = id;
         });
 
-        $(document).on('click', '#editButton', function(event) {
-            event.preventDefault();
-            let href = $(this).attr('data-attr');
+        $('#editModal').on('show.bs.modal', function (event) {
+            let id = $(event.relatedTarget).data('id') 
+            document.getElementById("id-update").innerHTML = id;
             $.ajax({
-                url: href
-                , beforeSend: function() {
-                    $('#loader').show();
+                url: 'transaksi/'+id,
+                type: "GET",
+                dataType: 'json',
+                success: function (data) {
+                    console.log(data.success)
+                    $('#tanggal').val(data.success.tanggal);
+                    $('#chart_of_account_id').val(data.success.chart_of_account_id);
+                    $('#kategori_id').val(data.success.kategori_id);
+                    $('#debit').val(data.success.debit);
+                    $('#credit').val(data.success.credit);
+                    $('#deskripsi').html(data.success.deskripsi);
                 },
-                // return the result
-                success: function(result) {
-                    $('#editModal').modal("show");
-                    $('#editContent').html(result).show();
+                error: function (data) {
+                    toastr.error(data.message);
                 }
-                , complete: function() {
-                    $('#loader').hide();
-                }
-                , error: function(jqXHR, testStatus, error) {
-                    alert("Page " + href + " cannot open. Error:" + error);
-                    $('#loader').hide();
-                }
-                , timeout: 8000
-            })
+             });
         });
+
+        // $(document).on('click', '#editButton', function(event) {
+        //     event.preventDefault();
+        //     let href = $(this).attr('data-attr');
+        //     $.ajax({
+        //         url: href
+        //         , beforeSend: function() {
+        //             $('#loader').show();
+        //         },
+        //         // return the result
+        //         success: function(result) {
+        //             $('#editModal').modal("show");
+        //             $('#editContent').html(result).show();
+        //         }
+        //         , complete: function() {
+        //             $('#loader').hide();
+        //         }
+        //         , error: function(jqXHR, testStatus, error) {
+        //             alert("Page " + href + " cannot open. Error:" + error);
+        //             $('#loader').hide();
+        //         }
+        //         , timeout: 8000
+        //     })
+        // });
     </script>
 @endpush
