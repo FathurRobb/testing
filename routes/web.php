@@ -22,7 +22,7 @@ use App\Http\Controllers\TbTransaksiController;
 // });
 
 Route::get('/', [DashboardController::class, 'index']);
-Route::get('export', [DashboardController::class, 'export'])->name('export');
+Route::post('export', [DashboardController::class, 'export'])->name('export');
 
 Route::resource('kategori', MKategoriController::class);
 Route::resource('coa', MChartOfAccountController::class);

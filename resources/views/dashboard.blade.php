@@ -84,9 +84,9 @@
                     <h4 class="card-title float-left mb-2">Laporan Profit/Loss</h4>
                 </div>
                 <div class="card-body">
-                    <a href="{{ route('export') }}" type="button" class="btn btn-outline-success btn-sm">
+                    <button type="button" class="btn btn-outline-success btn-sm" data-toggle="modal" data-target="#exportModal">
                         <i class="material-icons">print</i> Excel
-                    </a>
+                    </button>
                     <div class="table-responsive">
                         <table class="table" id="table">
                             <thead class="text-info">
@@ -112,9 +112,48 @@
                         </table>
                     </div>
                 </div>
-                <div class="mx-auto d-block">
+                {{-- <div class="mx-auto d-block">
                     {{ $datas->links() }}
-                </div>
+                </div> --}}
+                <form method="POST" action="export" enctype="multipart/form-data">
+                    {{ csrf_field() }}
+                    <div class="modal fade" id="exportModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="exampleModalLabel">Export Laporan Profit/Loss</h5>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group has-info">
+                                    <label for="nama" style="color: #00bcd4">Tanggal Mulai</label>
+                                    <select class="form-control" name="date_from">
+                                        <option value="" selected disabled>--Semua Data--</option>
+                                        @foreach ($tanggals as $tanggal)
+                                            <option value={{$tanggal}}>{{$tanggal}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group has-info">
+                                    <label for="nama" style="color: #00bcd4">Tanggal Berakhir</label>
+                                    <select class="form-control" name="date_to">
+                                        <option value="" selected disabled>--Semua Data--</option>
+                                        @foreach ($tanggals as $tanggal)
+                                            <option value={{$tanggal}}>{{$tanggal}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
+                              <button type="submit" class="btn btn-info" id="saveBtn">Simpan</button>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
